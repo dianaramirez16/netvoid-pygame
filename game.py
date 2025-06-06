@@ -4,9 +4,13 @@ from sprites.player import Player
 from levels import level1, level2
 TILE_SIZE = 40
 
+#800x600
+
 class Game:
     def __init__(self, screen):
         self.screen = screen
+        self.background_image = pygame.image.load("assets/images/working-bg.png").convert()
+        self.background_image = pygame.transform.scale(self.background_image, self.screen.get_size())
         self.levels={
             "level1": level1,
             "level2": level2,
@@ -18,6 +22,7 @@ class Game:
         self.interaction_text = None
         self.show_more_text = False
         self.button_rect = pygame.Rect(0, 0, 120, 40)
+        
 
     #ADDED to change level
     def switch_level(self, new_level_name):
@@ -28,6 +33,7 @@ class Game:
 
     def handle_events(self):
         for event in pygame.event.get():
+            
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
@@ -64,6 +70,7 @@ class Game:
 
 
     def draw(self,screen):
+        screen.blit(self.background_image,(0,0))
         self.levels[self.current_level].draw_level(self.screen)
         self.player_group.draw(self.screen)
         for item in self.items:

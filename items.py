@@ -14,6 +14,7 @@ def create_scrapmetal_surface():
     
     return surface
 
+
 def load_items():
     scrap = Item("scrapmetal", (5, 7), create_scrapmetal_surface())
     return [scrap]

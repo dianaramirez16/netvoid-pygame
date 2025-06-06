@@ -15,3 +15,4 @@ while running:
     game.handle_events()
     game.update()
     game.draw(screen)
+    
