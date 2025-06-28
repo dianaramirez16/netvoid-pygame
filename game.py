@@ -75,7 +75,7 @@ class Game:
         self.player_group.draw(self.screen)
         for item in self.items:
             item.draw(self.screen)
-
+        
         if self.interaction_text:
             modal_width = 500
             modal_height = 400

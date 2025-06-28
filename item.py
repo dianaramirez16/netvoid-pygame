@@ -19,3 +19,4 @@ class Item:
         if not self.collected and self.tile_pos == player_tile_pos:
             self.collected = True
             print(f"Collected: {self.name}")
+
