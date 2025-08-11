@@ -9,8 +9,12 @@ TILE_SIZE = 40
 class Game:
     def __init__(self, screen):
         self.screen = screen
-        self.background_image = pygame.image.load("assets/images/working-bg.png").convert()
+        self.background_image = pygame.image.load("assets/images/working-bg.png").convert_alpha()
         self.background_image = pygame.transform.scale(self.background_image, self.screen.get_size())
+        
+        self.overlay_image = pygame.image.load("assets/images/outer-bg-png.png").convert_alpha()
+        self.overlay_image = pygame.transform.scale(self.overlay_image, self.screen.get_size())
+
         self.levels={
             "level1": level1,
             "level2": level2,
@@ -71,11 +75,12 @@ class Game:
 
     def draw(self,screen):
         screen.blit(self.background_image,(0,0))
+        screen.blit(self.overlay_image, (0, 0))
         self.levels[self.current_level].draw_level(self.screen)
         self.player_group.draw(self.screen)
         for item in self.items:
             item.draw(self.screen)
-        
+
         if self.interaction_text:
             modal_width = 500
             modal_height = 400
@@ -117,6 +122,60 @@ class Game:
             # Blit modal
             self.screen.blit(modal_surface, (modal_x, modal_y))
 
+        ##inventory hud
+        hud_width=90
+        hud_height=270
+        padding=2
+        item_size=20
+        #hud_x=self.screen.get_width()-hud_width-padding
+        #hud_y=self.screen.get_height() -hud_height-padding
+        hud_x=30
+        hud_y=300
+        #hud background
+        pygame.draw.rect(self.screen,(0,0,0),(hud_x,hud_y,hud_width,hud_height))
+        #hud border
+        pygame.draw.rect(self.screen, (60,191, 253), (hud_x, hud_y, hud_width, hud_height), width=2)
+
+        font = pygame.font.SysFont(None, 24)
+        title = font.render("Inventory", True, (255, 255, 255))
+        self.screen.blit(title, (hud_x + 10, hud_y + 10))
+
+        # Draw items in a 4x3 grid
+        x_offset = hud_x + 10
+        y_offset = hud_y + 40
+        columns = 2
+
+        for index, item in enumerate(self.items):
+            col = index % columns
+            row = index // columns
+            slot_x = x_offset + col * (item_size + 10)
+            slot_y = y_offset + row * (item_size + 10)
+            slot_rect = pygame.Rect(slot_x, slot_y, item_size, item_size)
+
+            # Draw item slot background
+            pygame.draw.rect(self.screen, (40, 40, 40), (slot_x, slot_y, item_size, item_size), border_radius=4)
+
+            # If collected, draw the item image
+            if item.collected:
+                img = pygame.transform.scale(item.surface, (item_size, item_size))
+                self.screen.blit(img, (slot_x, slot_y))
+            else:
+                # Draw a placeholder "locked" slot (X icon)
+                pygame.draw.line(self.screen, (120, 120, 120), (slot_x, slot_y), (slot_x + item_size, slot_y + item_size), 2)
+                pygame.draw.line(self.screen, (120, 120, 120), (slot_x + item_size, slot_y), (slot_x, slot_y + item_size), 2)
+            mouse_pos = pygame.mouse.get_pos()
+            
+            if slot_rect.collidepoint(mouse_pos):
+                font = pygame.font.SysFont(None, 20)
+                tooltip_text = font.render(item.name, True, (255, 255, 255))
+                tooltip_bg = pygame.Surface((tooltip_text.get_width() + 10, tooltip_text.get_height() + 6))
+                tooltip_bg.fill((0, 0, 0))
+                tooltip_bg.blit(tooltip_text, (5, 3))
+
+                # Draw tooltip near mouse
+                tooltip_x = mouse_pos[0] + 12
+                tooltip_y = mouse_pos[1] + 12
+                self.screen.blit(tooltip_bg, (tooltip_x, tooltip_y))
         pygame.display.flip()
 
 
